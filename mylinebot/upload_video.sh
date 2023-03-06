@@ -5,7 +5,7 @@ BROADCAST_ID=`cat broadcast_id.txt`
 
 # convert
 echo "${BROADCAST_ID}.h264 : convert started."
-ffmpeg -i ${BROADCAST_ID}.h264 -loglevel quiet -c:v h264_omx ${BROADCAST_ID}.mp4
+ffmpeg -i ${BROADCAST_ID}.h264 -loglevel quiet -vcodec copy ${BROADCAST_ID}.mp4
 echo "${BROADCAST_ID}.mp4  : convert finished."
 
 # upload

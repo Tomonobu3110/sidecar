@@ -16,3 +16,8 @@ nohup.out
 # node_moidules
 node_modules/
 
+# video files
+*.h264
+*.mp4
+
+
