@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Start LINE BOT
+nohup bash -c 'source .credentials; CHANNEL_SECRET=$CHANNEL_SECRET CHANNEL_ACCESS_TOKEN=$CHANNEL_ACCESS_TOKEN node bot_server.js' &
+
+# wait 5 sec...
+sleep 5
+
+# configration
+
+source .credentials
+
+# ngrok URL
+URL=`curl -s localhost:4040/api/tunnels | jq -r ".tunnels[0].public_url" | sed -e s/http:/https:/`
+
+# LINE Webhook
+curl -X PUT -H "Authorization: Bearer ${CHANNEL_ACCESS_TOKEN}" -H 'Content-Type:application/json' -d '{"endpoint":"'"${URL}"/webhook'"}' https://api.line.me/v2/bot/channel/webhook/endpoint
+
+echo $URL
+

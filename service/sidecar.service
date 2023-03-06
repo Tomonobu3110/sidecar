@@ -1,0 +1,20 @@
+[Unit]
+#just what it does
+Description= sidecar service
+After=network-online.target
+
+[Service]
+#not run by root, but by me
+User=pi
+#we assume the full service as active one the script was started
+Type=forking
+#working directory
+WorkingDirectory=/home/pi/sidecar/mylinebot
+#where to find the executable
+ExecStart=/home/pi/sidecar/mylinebot/start_sidecar.sh
+#what you want: make sure it always is running
+Restart=always
+
+[Install]
+#which service wants this to run - default.target is just it is loaded by default
+WantedBy=default.target

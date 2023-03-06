@@ -1,0 +1,8 @@
+# googles' secrets
+client_secrets.json
+upload_video.py-oauth2.json
+
+# sample mp4 files
+*.mp4
+
+

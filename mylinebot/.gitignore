@@ -1,0 +1,18 @@
+# googles' secrets
+client_secrets.json
+upload_video.py-oauth2.json
+
+# outputs by prepare_live.sh
+access_token.txt
+broadcast_id.txt
+stream_id.txt
+
+# ?
+.credentials.swp
+
+# log
+nohup.out
+
+# node_moidules
+node_modules/
+
