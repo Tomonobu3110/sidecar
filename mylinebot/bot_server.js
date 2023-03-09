@@ -34,68 +34,89 @@ app.post('/webhook', line.middleware(config), (req, res) => {
 const client = new line.Client(config);
 
 async function handleEvent(event) {
-  if (event.type !== 'message' || event.message.type !== 'text') {
+  // pre condition check
+  if (event.type !== 'message') {
     return Promise.resolve(null);
   }
-  
-  else if (event.message.text == 'ライブ準備') {
-    exec('bash prepare_live.sh', (err, stdout, stderr) => {
+
+  // image message
+  if (event.message.type == 'image') {
+    exec("curl -v -X GET https://api-data.line.me/v2/bot/message/" + event.message.id + "/content -H 'Authorization: Bearer " + process.env.CHANNEL_ACCESS_TOKEN + "' --output image." + event.message.id + ".jpg", (err, stdout, stderr) => {
       return client.replyMessage(event.replyToken, {
         type: 'text',
-        text: 'ライブの準備ができました。視聴URLは https://www.youtube.com/watch?v=' + stdout + ' です'
+        text: '画像を受信したのでローカルに保存したよ'
       });
     });
   }
 
-  else if (event.message.text == 'ライブ開始') {
-    exec('bash start_live.sh');
-    // このメッセージは即座に返す
-    return client.replyMessage(event.replyToken, {
-      type: 'text',
-      text: 'ライブを開始します。1分くらいかかります'
-    });
-  }
+  // text message
+  if (event.message.type == 'text') {
+    if (event.message.text == 'ライブ準備') {
+      exec('bash prepare_live.sh', (err, stdout, stderr) => {
+        return client.replyMessage(event.replyToken, {
+          type: 'text',
+          text: 'ライブの準備ができました。視聴URLは https://www.youtube.com/watch?v=' + stdout + ' です'
+        });
+      });
+    }
 
-  else if (event.message.text == 'ライブ終了') {
-    exec('bash stop_live.sh', (err, stdout, stderr) => {
+    else if (event.message.text == 'ライブ開始') {
+      exec('bash start_live.sh');
+      // このメッセージは即座に返す
       return client.replyMessage(event.replyToken, {
         type: 'text',
-        text: 'ライブを終了します'
+        text: 'ライブを開始します。1分くらいかかります'
       });
-    });
-  }
+    }
 
-  else if (event.message.text == 'アップロード') {
-    exec('bash upload_video.sh', (err, stdout, stderr) => {
+    else if (event.message.text == 'ライブ終了') {
+      exec('bash stop_live.sh', (err, stdout, stderr) => {
+        return client.replyMessage(event.replyToken, {
+          type: 'text',
+          text: 'ライブを終了します'
+        });
+      });
+    }
+
+    else if (event.message.text == 'アップロード') {
+      exec('bash upload_video.sh', (err, stdout, stderr) => {
+        return client.replyMessage(event.replyToken, {
+          type: 'text',
+          text: stdout
+        });
+      });
+    }
+
+    else if (event.message.text == 'df') {
+      exec('df', (err, stdout, stderr) => {
+        return client.replyMessage(event.replyToken, {
+          type: 'text',
+          text: stdout
+        });
+      });
+    }
+
+    else if (event.message.text == 'shutdown') {
+      exec('sudo shutdown -h now');
       return client.replyMessage(event.replyToken, {
         type: 'text',
-        text: stdout
+        text: 'システムをシャットダウンします。ばいばいーい'
       });
-    });
-  }
+    }
 
-  else if (event.message.text == 'df') {
-    exec('df', (err, stdout, stderr) => {
+    else if (event.message.type == 'image') {
+    }
+
+    else {
       return client.replyMessage(event.replyToken, {
         type: 'text',
-        text: stdout
+        text: '(' + event.message.text + ')' //実際に返信の言葉を入れる箇所
       });
-    });
-  }
-
-  else if (event.message.text == 'shutdown') {
-    exec('sudo shutdown -h now');
-    return client.replyMessage(event.replyToken, {
-      type: 'text',
-      text: 'システムをシャットダウンします。ばいばいーい'
-    });
-  }
+    }
+  } // end of text message handling block
 
   else {
-    return client.replyMessage(event.replyToken, {
-      type: 'text',
-      text: event.message.text //実際に返信の言葉を入れる箇所
-    });
+    return Promise.resolve(null);
   }
 }
 
