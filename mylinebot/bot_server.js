@@ -74,6 +74,23 @@ async function handleEvent(event) {
     });
   }
 
+  else if (event.message.text == 'df') {
+    exec('df', (err, stdout, stderr) => {
+      return client.replyMessage(event.replyToken, {
+        type: 'text',
+        text: stdout
+      });
+    });
+  }
+
+  else if (event.message.text == 'shutdown') {
+    exec('sudo shutdown -h now');
+    return client.replyMessage(event.replyToken, {
+      type: 'text',
+      text: 'システムをシャットダウンします。ばいばいーい'
+    });
+  }
+
   else {
     return client.replyMessage(event.replyToken, {
       type: 'text',
