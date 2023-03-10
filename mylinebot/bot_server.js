@@ -3,15 +3,23 @@
 const express = require('express');
 const line = require('@line/bot-sdk');
 const exec = require('child_process').exec;
+const fs = require("fs");
+const path = require("path");
+const AWS = require("aws-sdk");
 
 const PORT = process.env.PORT || 3000;
 
+// LINE credentials
 //console.log(process.env.CHANNEL_SECRET);
 //console.log(process.env.CHANNEL_ACCESS_TOKEN);
 const config = {
     channelSecret: process.env.CHANNEL_SECRET,
     channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN,
 };
+
+// AWS configuration
+AWS.config.update({ region: "ap-northeast-1" });
+var s3 = new AWS.S3();
 
 const app = express();
 
@@ -42,9 +50,43 @@ async function handleEvent(event) {
   // image message
   if (event.message.type == 'image') {
     exec("curl -v -X GET https://api-data.line.me/v2/bot/message/" + event.message.id + "/content -H 'Authorization: Bearer " + process.env.CHANNEL_ACCESS_TOKEN + "' --output image." + event.message.id + ".jpg", (err, stdout, stderr) => {
+
+      // read broadcast_id
+      var broadcast_id;
+      try {
+        broadcast_id = fs.readFileSync('./broadcast_id.txt', 'utf8');
+      } catch (err) {
+        //console.log(err);
+      }
+
+      // S3へファイルアップロード
+      // 自動でマルチパートアップロードもやってくれる
+      // https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#upload-property
+      const bucket_name = 'youtube-iframe-player-api-test';
+      const target_file = 'image.' + event.message.id + '.jpg';
+      const key = broadcast_id ? broadcast_id.trimEnd() + '/' + target_file : target_file;
+      //console.log('bucket name : ' + bucket_name);
+      //console.log('target file : ' + target_file);
+      //console.log('key         : ' + key);
+      s3.upload({
+        Bucket: bucket_name,
+        Key: key,
+        Body: fs.createReadStream(path.join(__dirname, target_file)),
+        ContentType: "image/jpeg"
+      }, {
+        partSize: 100 * 1024 * 1024,
+        queueSize: 4
+      }, (err, data) => {
+        if (err) {
+          console.log(err);
+          return;
+        }
+        console.log(JSON.stringify(data));
+      });
+
       return client.replyMessage(event.replyToken, {
         type: 'text',
-        text: '画像を受信したのでローカルに保存したよ'
+        text: '画像を受信したのでS3に保存したよ'
       });
     });
   }
