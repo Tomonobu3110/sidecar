@@ -82,11 +82,62 @@ async function handleEvent(event) {
           return;
         }
         console.log(JSON.stringify(data));
-      });
+        
+        // update list.json on S3
+        //const bucket_name = 'youtube-iframe-player-api-test';
+        const target_json = 'list.json';
+        const key_json = broadcast_id ? broadcast_id.trimEnd() + '/' + target_json : target_json;
+        //console.log('bucket name : ' + bucket_name);
+        //console.log('target file : ' + target_file);
+        //console.log('key         : ' + key);
 
-      return client.replyMessage(event.replyToken, {
-        type: 'text',
-        text: '画像を受信したのでS3に保存したよ'
+        // get object from S3
+        var list_json;
+        const get_params = {
+          Bucket: bucket_name,
+          Key: key_json
+        };
+        s3.getObject(get_params, (err, data) => {
+          if (err) {
+            console.error("s3 : get error");
+            list_json = { files: [] };
+          } else {
+            list_json = JSON.parse(data.Body.toString());
+          }
+
+          // update json
+          const newObject = {
+            bucket: bucket_name,
+            key: key,
+            file: target_file
+          };
+          //console.log("new object");
+          //console.log(newObject);
+
+          list_json.files.push(newObject);
+          //console.log("list_json");
+          //console.log(JSON.stringify(list_json));
+
+          // put object to S3
+          const put_params = {
+            Bucket: bucket_name,
+            Key: key_json,
+            Body: JSON.stringify(list_json)
+          };
+          s3.putObject(put_params, (err, data) => {
+            if (err) {
+              console.error("s3 : put error");
+            } else {
+              console.log('JSON file updated successfully');
+            }
+          });
+        });
+
+        // reply to LINE friend.
+        return client.replyMessage(event.replyToken, {
+          type: 'text',
+          text: '画像を受信したのでS3に保存したよ'
+        });
       });
     });
   }
