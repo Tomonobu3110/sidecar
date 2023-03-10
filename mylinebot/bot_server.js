@@ -148,7 +148,7 @@ async function handleEvent(event) {
       exec('bash prepare_live.sh', (err, stdout, stderr) => {
         return client.replyMessage(event.replyToken, {
           type: 'text',
-          text: 'ライブの準備ができました。視聴URLは https://www.youtube.com/watch?v=' + stdout + ' です'
+          text: 'ライブの準備ができました。視聴URLは https://www.youtube.com/watch?v=' + stdout + ' です。コンテンツマッシュアップURLは https://youtube-iframe-player-api-test.s3.ap-northeast-1.amazonaws.com/index.html?id=' + stdout + 'です。'
         });
       });
     }
