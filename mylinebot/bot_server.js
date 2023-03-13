@@ -180,6 +180,25 @@ async function handleEvent(event) {
       });
     }
 
+    else if (event.message.text == 'ユーザ登録') {
+      exec('python step_1_generate_url.py', (err, stdout, stderr) => {
+        return client.replyMessage(event.replyToken, {
+          type: 'text',
+          text: stdout
+        });
+      });
+    }
+
+    else if (event.message.text.startsWith("code : ")) {
+      const code = event.message.text.substring("code : ".length);
+      exec('python step_2_generate_token.py ' + code, (err, stdout, stderr) => {
+        return client.replyMessage(event.replyToken, {
+          type: 'text',
+          text: "ユーザを登録しました"
+        });
+      });
+    }
+
     else if (event.message.text == 'df') {
       exec('df', (err, stdout, stderr) => {
         return client.replyMessage(event.replyToken, {
@@ -195,9 +214,6 @@ async function handleEvent(event) {
         type: 'text',
         text: 'システムをシャットダウンします。ばいばいーい'
       });
-    }
-
-    else if (event.message.type == 'image') {
     }
 
     else {
