@@ -17,6 +17,7 @@
     <hr>
     以下のコードをコピーしてLINEで Sidecar BOT に送ってください (code : の部分から全部コピペしてください) <BR>
     <div id='code'></div>
+    <button id='copy_button' onclick="copyToClipboard()" disabled>Copy Text</button>
 
     <script>
       // URLのクエリパラメータをパースする
@@ -37,9 +38,26 @@
       // <div>要素の中の文字列を置換された文字列に更新する
       console.log(code);
       if (code != null && code.length > 0) {
-        divElement.innerHTML = "<p class='valid'>code : " + code;
+        divElement.innerHTML = "<p class='valid' id='valid_code'>code : " + code;
+        document.getElementById('copy_button').disabled = false;
       } else {
         divElement.innerHTML = "<p class='error'>コードが取得できません</p>";
+      }
+
+      function copyToClipboard() {
+        var elm = document.getElementById('valid_code');
+        if (elm !== null) {
+          var text = document.getElementById('valid_code').innerText;
+          navigator.clipboard.writeText(text)
+            .then(function() {
+              alert('Text copied to clipboard!');
+            })
+            .catch(function() {
+              alert('Failed to copy text to clipboard!');
+            });
+        } else {
+          alert('[ERROR] no valid code found');
+        }
       }
     </script>
   </body>
