@@ -1,5 +1,5 @@
 # googles' secrets
-client_secrets.json
+client_secrets.*
 upload_video.py-oauth2.json
 
 # outputs by prepare_live.sh

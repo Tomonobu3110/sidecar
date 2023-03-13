@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <title>[sidecar] code generated</title>
+    <style>
+    .error {
+      color: red;
+    }
+    .valid {
+      color: green;
+    }
+    </style>
+  </head>
+  <body>
+    <h1>コードが発行されました</h1>
+    <hr>
+    以下のコードをコピーしてLINEで Sidecar BOT に送ってください (code : の部分から全部コピペしてください) <BR>
+    <div id='code'></div>
+
+    <script>
+      // URLのクエリパラメータをパースする
+      const urlParams = new URLSearchParams(window.location.search);
+
+      // "id"パラメータの値を取得する
+      const code = urlParams.get('code');
+
+      // IDで指定された<div>要素を取得する
+      const divElement = document.getElementById('code');
+
+      // <div>要素の中の文字列を取得する
+      //const divText = divElement.innerHTML;
+
+      // 置換を行う
+      //const replacedText = divText.replace("置換前の文字列", "置換後の文字列");
+
+      // <div>要素の中の文字列を置換された文字列に更新する
+      console.log(code);
+      if (code != null && code.length > 0) {
+        divElement.innerHTML = "<p class='valid'>code : " + code;
+      } else {
+        divElement.innerHTML = "<p class='error'>コードが取得できません</p>";
+      }
+    </script>
+  </body>
+  
+</html>

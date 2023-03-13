@@ -1,2 +1,6 @@
 # credentials
 .credentials
+
+# backup files
+*.BAK
+
