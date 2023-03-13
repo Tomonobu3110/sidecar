@@ -1,0 +1,115 @@
+/* スマートフォン向けスタイル */
+@media screen and (max-width: 480px) {
+  body {
+    font-size: 14px;
+  }
+  h1 {
+    font-size: 24px;
+  }
+  .container {
+    width: 90%;
+    margin: 0 auto;
+  }
+  .box {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+  .box img {
+    width: 100%;
+    height: auto;
+  }
+}
+
+/* タブレット向けスタイル */
+@media screen and (min-width: 481px) and (max-width: 768px) {
+  body {
+    font-size: 16px;
+  }
+  h1 {
+    font-size: 32px;
+  }
+  .container {
+    width: 80%;
+    margin: 0 auto;
+  }
+  .box {
+    width: 48%;
+    margin-right: 4%;
+    margin-bottom: 20px;
+    float: left;
+  }
+  .box:nth-child(2n) {
+    margin-right: 0;
+  }
+  .box img {
+    width: 100%;
+    height: auto;
+  }
+}
+
+/* PC向けスタイル */
+@media screen and (min-width: 769px) {
+  body {
+    font-size: 18px;
+  }
+  h1 {
+    font-size: 48px;
+  }
+  .container {
+    width: 80%;
+    margin: 0 auto;
+  }
+  .box {
+    width: 31%;
+    margin-right: 4%;
+    margin-bottom: 20px;
+    float: left;
+  }
+  .box:nth-child(3n) {
+    margin-right: 0;
+  }
+  .box img {
+    width: 100%;
+    height: auto;
+  }
+}
+
+/* 019 */
+.button019 a {
+    background: #eee;
+    border-radius: 3px;
+    position: relative;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin: 0 auto;
+    max-width: 280px;
+    padding: 10px 25px;
+    color: #313131;
+    transition: 0.3s ease-in-out;
+    font-weight: 500;
+}
+.button019 a:after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  bottom: 0;
+  right: 2rem;
+  font-size: 90%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: right 0.3s;
+  width: 6px;
+  height: 6px;
+  border-top: solid 2px currentColor;
+  border-right: solid 2px currentColor;
+  transform: translateY(-50%) rotate(45deg);
+}
+.button019 a:hover {
+  background: #6bb6ff;
+  color: #FFF;
+}
+.button019 a:hover:after {
+  right: 1.4rem;
+}

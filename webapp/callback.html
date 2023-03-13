@@ -3,6 +3,7 @@
   <head>
     <meta charset='utf-8'>
     <title>[sidecar] code generated</title>
+    <link rel='stylesheet' href='styles.css'>
     <style>
     .error {
       color: red;
@@ -13,11 +14,17 @@
     </style>
   </head>
   <body>
+    <div class='container'>
     <h1>コードが発行されました</h1>
-    <hr>
-    以下のコードをコピーしてLINEで Sidecar BOT に送ってください (code : の部分から全部コピペしてください) <BR>
-    <div id='code'></div>
-    <button id='copy_button' onclick="copyToClipboard()" disabled>Copy Text</button>
+      <div class='box'>
+        以下のコードをボタンを押してコピーして LINE で Sidecar BOT に送ってください
+        <div id='code'></div>
+        <!-- <button id='copy_button' onclick="copyToClipboard()" disabled>Copy Text</button> -->
+        <div class="button019">
+        	<a href="#" id='copy_button' onclick="copyToClipboard()" disabled>タップしてコピーする</a>
+        </div>
+      </div>
+    </div>
 
     <script>
       // URLのクエリパラメータをパースする
@@ -50,7 +57,7 @@
           var text = document.getElementById('valid_code').innerText;
           navigator.clipboard.writeText(text)
             .then(function() {
-              alert('Text copied to clipboard!');
+              alert('コードをコピーしました');
             })
             .catch(function() {
               alert('Failed to copy text to clipboard!');
