@@ -69,7 +69,8 @@ if __name__ == '__main__':
   flow = flow_from_clientsecrets(CLIENT_SECRETS_FILE,
     scope=YOUTUBE_API_SCOPES,
     message=MISSING_CLIENT_SECRETS_MESSAGE,
-    redirect_uri=YOUTUBE_REDIRECT_URL)
+    redirect_uri=YOUTUBE_REDIRECT_URL,
+    prompt='consent')
 
   # Cached credentials
   storage = Storage("sidecar-linebot-oauth2.json")
