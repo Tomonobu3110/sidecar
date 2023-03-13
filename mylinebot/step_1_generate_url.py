@@ -78,5 +78,5 @@ if __name__ == '__main__':
   # Do OAuth2 if credentials is not valid
   if credentials is None or credentials.invalid:
     auth_uri = flow.step1_get_authorize_url()
-    print(auth_uri)
+    print(auth_uri + '&openExternalBrowser=1')
 
