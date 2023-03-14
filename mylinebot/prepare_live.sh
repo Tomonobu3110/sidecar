@@ -21,5 +21,10 @@ STREAM_ID=`curl -s --request GET "https://www.googleapis.com/youtube/v3/liveStre
 #echo $STREAM_ID
 echo $STREAM_ID > stream_id.txt
 
+# Stream info
+curl -s --request GET "https://www.googleapis.com/youtube/v3/liveStreams?part=id,snippet,cdn,status&mine=true" --header "Authorization: Bearer $ACCESS_TOKEN" --header 'Accept: application/json' --header 'Content-Type: application/json' --compressed | jq -r .items[0].cdn.ingestionInfo > stream_info.json
+YOUTUBE_STREAM_KEY=`cat stream_info.json | jq -r .streamName`
+YOUTUBE_STREAM_URI=`cat stream_info.json | jq -r .ingestionAddress`
+
 # Bind Broadcasts And Streams
 curl -s --request POST "https://www.googleapis.com/youtube/v3/liveBroadcasts/bind?id=$BROADCAST_ID&part=id,snippet,contentDetails,status&streamId=$STREAM_ID&key=$API_KEY" --header "Authorization: Bearer $ACCESS_TOKEN" --header 'Accept: application/json' --header 'Content-Type: application/json' --compressed | jq -r ".id"

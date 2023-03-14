@@ -2,6 +2,7 @@
 client_secrets.*
 upload_video.py-oauth2.json
 sidecar-linebot-oauth2.json
+stream_info.json
 
 # outputs by prepare_live.sh
 access_token.txt
