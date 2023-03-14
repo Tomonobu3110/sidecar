@@ -153,7 +153,7 @@ async function handleEvent(event) {
   if (event.message.type == 'text') {
     if (event.message.text == 'ライブ準備') {
       exec('bash prepare_live.sh', (err, stdout, stderr) => {
-        const broadcat_id = stdout;
+        const broadcast_id = stdout;
 
         // reply to user
         return client.replyMessage(event.replyToken, {

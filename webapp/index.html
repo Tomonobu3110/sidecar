@@ -40,7 +40,8 @@
       }
       
       // JSONファイルのURLを指定
-      const url = 'https://youtube-iframe-player-api-test.s3.ap-northeast-1.amazonaws.com/' + id + '/list.json';
+      const base_url = 'https://youtube-iframe-player-api-test.s3.ap-northeast-1.amazonaws.com/';
+      const url = base_url + id + '/list.json';
 
       // 画像要素を追加するDOM要素を取得
       const imageContainer = document.getElementById('image-container');
@@ -53,17 +54,36 @@
               console.log(data)
 
               // 画像のURLから画像要素を作成し、DOMに追加
+              var start_time;
               data.files.forEach(imageItem => {
                 console.log(imageItem);
-                console.log(imageItem.key.toString());
-                const img_url = "https://youtube-iframe-player-api-test.s3.ap-northeast-1.amazonaws.com/" + imageItem.key.toString();
-                console.log(img_url);
-                if (img_url.endsWith('.jpg')) {
-                  const img = document.createElement('img');
-                  img.src = img_url;
-                  img.style.width = "10%";
-                  img.style.height = "10%";
-                  imageContainer.appendChild(img);
+                console.log(imageItem.event.toString());
+
+                if (imageItem.event.toString() === "startlive") {
+                  start_time = imageItem.time;
+                  console.log("Start time is " + start_time);
+                }
+  
+                else if (imageItem.event.toString() === "uploadimage") {
+                  console.log(imageItem.key.toString());
+                  const img_url = base_url + imageItem.key.toString();
+                  console.log(img_url);
+                  if (img_url.endsWith('.jpg')) {
+                    // diff in second
+                    const date1 = new Date(start_time);
+                    const date2 = new Date(imageItem.time);
+                    const diffInSec = (date2.getTime() - date1.getTime()) / 1000;
+                    //const delay = 40;
+                    const delay = 38;
+
+                    // create image element
+                    const img = document.createElement('img');
+                    img.src = img_url;
+                    img.style.width = "10%";
+                    img.style.height = "10%";
+                    img.addEventListener('click', { sec: diffInSec - delay, handleEvent: seekTo });
+                    imageContainer.appendChild(img);
+                  }
                 }
               });
           });
@@ -113,8 +133,14 @@
         }
       }
       function stopVideo() {
-        player.stopVideo(); // ★ 再生停止
+        // player.stopVideo(); // ★ 再生停止
       }
+
+      function seekTo(e) {
+        console.log("seekTo --> " + this.sec);
+        player.seekTo(this.sec, true);
+      }
+
     </script>
   </body>
 </html>
