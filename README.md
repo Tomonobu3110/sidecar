@@ -1,12 +1,12 @@
 # sidecar
 
-# directory and description
+## directory and description
 
 | directory name | description |
 | ---- | ---- |
 | mylinebot | Sidecar Line BOT (Backend) |
-| oauth | oauth test |
-| service | .service file and install script |
-| uploader | uploader test |
+| oauth | OAuth2 test code for YouTube API |
+| service | .service files for systemctl and install script |
+| uploader | uploader test code for YouTube API |
 | webapp | Sedecar Web App (Frontend) |
 
