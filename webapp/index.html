@@ -2,21 +2,45 @@
 <html>
   <head>
     <meta charset='utf-8'>
+    <title>斎藤友の YouTube IFrame Player API のテストサイトへようこそ！</title>
+    <style>
+      /* タイトルのスタイル */
+      .title {
+        text-align: center;
+      }
+      /* YouTube動画のスタイル */
+      .video {
+        margin: 0 auto;
+        display: block;
+        width: 640px;
+        height: 360px;
+      }
+      /* 画像一覧のスタイル */
+      .image-container {
+        display: flex;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+      .image {
+        flex-shrink: 0;
+        width: 15%;
+        /* height: 10%; */
+        margin-right: 10px;
+      }
+    </style>
   </head>
   <body>
-    <h1>斎藤友の YouTube IFrame Player API のテストサイトへようこそ！</h1>
-    動画IDは <div id='broadcast_id'>a4XdAOxSLxs</div> です <br>
-    <hr>
-    ここに動画中にLINEに送った写真が表示されます<br>
-    <div id='image-container'></div>
-    <hr>
-    この下に YouTube動画 が張り付いているはず～ <br>
+    <!-- タイトル -->
+    <h1 class="title"><div id='broadcast_id'>動画IDは a4XdAOxSLxs です</div></h1>
     
+    <!-- YouTube動画 -->
     <!-- 1. The <iframe> (and video player) will replace this <div> tag. -->
     <div id="player"></div> <!-- ★ ここが <iframe> に置換される -->
-
-    <br>この上に YouTube動画 が張り付いているはず～ <br>
+    
     <hr>
+
+    <!-- 画像一覧 -->
+    <div class="image-container" id="image-container"></div>
 
     <script>
       // URLのクエリパラメータをパースする
@@ -36,7 +60,7 @@
 
       // <div>要素の中の文字列を置換された文字列に更新する
       if (id) {
-        divElement.innerHTML = id;
+        divElement.innerHTML = '動画IDは ' + id + ' です';
       }
       
       // JSONファイルのURLを指定
@@ -79,8 +103,9 @@
                     // create image element
                     const img = document.createElement('img');
                     img.src = img_url;
-                    img.style.width = "10%";
-                    img.style.height = "10%";
+                    img.classList.add('image');
+                    //img.style.width = "10%";
+                    //img.style.height = "10%";
                     img.addEventListener('click', { sec: diffInSec - delay, handleEvent: seekTo });
                     imageContainer.appendChild(img);
                   }
@@ -105,10 +130,12 @@
       //    after the API code downloads.
       var player;
       function onYouTubeIframeAPIReady() {
-        player = new YT.Player('player', { // ★ ここで <div id="player"></div> を探り当てている
-                                           // ★ YT は youtube.com/iframe_api で定義されている
+        const container = document.getElementById('player');
+        container.classList.add('video');
+        player = new YT.Player(container, { 
           height: '360',
           width: '640',
+          class: 'video',
           videoId: id ? id : 'a4XdAOxSLxs', // ★ Broadcast ID
           events: {
             'onReady': onPlayerReady,             // ★ YouTube Player の準備完了
@@ -139,6 +166,7 @@
       function seekTo(e) {
         console.log("seekTo --> " + this.sec);
         player.seekTo(this.sec, true);
+        player.playVideo();
       }
 
     </script>
