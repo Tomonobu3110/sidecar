@@ -12,7 +12,7 @@ echo $ACCESS_TOKEN > access_token.txt
 # Create New Broadcasts
 DATE=`TZ=0 date '+%Y-%m-%dT%H:%M:%S.000Z'`
 #echo $DATE
-BROADCAST_ID=`curl -s --request POST "https://www.googleapis.com/youtube/v3/liveBroadcasts?part=id,snippet,contentDetails,status&key=$API_KEY" --header "Authorization: Bearer $ACCESS_TOKEN" --header 'Accept: application/json' --header 'Content-Type: application/json' --data '{ "snippet" : { "scheduledStartTime": "'"$DATE"'", "title": "Sidecar 配信テスト" }, "status" : { "privacyStatus": "private" }, "contentDetails" : { "latencyPreference" : "ultraLow" }}' --compressed | jq -r ".id"`
+BROADCAST_ID=`curl -s --request POST "https://www.googleapis.com/youtube/v3/liveBroadcasts?part=id,snippet,contentDetails,status&key=$API_KEY" --header "Authorization: Bearer $ACCESS_TOKEN" --header 'Accept: application/json' --header 'Content-Type: application/json' --data '{ "snippet" : { "scheduledStartTime": "'"$DATE"'", "title": "Sidecar 配信テスト" }, "status" : { "privacyStatus": "unlisted" }, "contentDetails" : { "latencyPreference" : "ultraLow" }}' --compressed | jq -r ".id"`
 #echo $BROADCAST_ID
 echo $BROADCAST_ID > broadcast_id.txt
 
