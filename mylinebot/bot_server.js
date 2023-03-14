@@ -41,6 +41,49 @@ app.post('/webhook', line.middleware(config), (req, res) => {
 
 const client = new line.Client(config);
 
+function updateListJson(bucket_name, broadcast_id, object) {
+  // update list.json on S3
+  const target_json = 'list.json';
+  const key_json = broadcast_id ? broadcast_id.trimEnd() + '/' + target_json : target_json;
+  //console.log('bucket name : ' + bucket_name);
+  //console.log('target file : ' + target_file);
+  //console.log('key         : ' + key);
+
+  // get object from S3
+  var list_json;
+  const get_params = {
+    Bucket: bucket_name,
+    Key: key_json
+  };
+  s3.getObject(get_params, (err, data) => {
+    if (err) {
+      console.error("s3 : get error");
+      list_json = { files: [] };
+    } else {
+      list_json = JSON.parse(data.Body.toString());
+    }
+
+    // update json
+    list_json.files.push(object);
+    //console.log("list_json");
+    //console.log(JSON.stringify(list_json));
+
+    // put object to S3
+    const put_params = {
+      Bucket: bucket_name,
+      Key: key_json,
+      Body: JSON.stringify(list_json)
+    };
+    s3.putObject(put_params, (err, data) => {
+      if (err) {
+        console.error("s3 : put error");
+      } else {
+        console.log('JSON file updated successfully');
+      }
+    });
+  });
+}
+
 async function handleEvent(event) {
   // pre condition check
   if (event.type !== 'message') {
@@ -84,54 +127,18 @@ async function handleEvent(event) {
         console.log(JSON.stringify(data));
         
         // update list.json on S3
-        //const bucket_name = 'youtube-iframe-player-api-test';
-        const target_json = 'list.json';
-        const key_json = broadcast_id ? broadcast_id.trimEnd() + '/' + target_json : target_json;
-        //console.log('bucket name : ' + bucket_name);
-        //console.log('target file : ' + target_file);
-        //console.log('key         : ' + key);
-
-        // get object from S3
-        var list_json;
-        const get_params = {
-          Bucket: bucket_name,
-          Key: key_json
+        // - toLocaleString('sv') 
+        //   see : https://qiita.com/oniki_ds/items/df6d84e50afe37538d5c
+        const newObject = {
+          event: "uploadimage",
+          bucket: bucket_name,
+          key: key,
+          file: target_file,
+          time: new Date().toLocaleString('sv')
         };
-        s3.getObject(get_params, (err, data) => {
-          if (err) {
-            console.error("s3 : get error");
-            list_json = { files: [] };
-          } else {
-            list_json = JSON.parse(data.Body.toString());
-          }
-
-          // update json
-          const newObject = {
-            bucket: bucket_name,
-            key: key,
-            file: target_file
-          };
-          //console.log("new object");
-          //console.log(newObject);
-
-          list_json.files.push(newObject);
-          //console.log("list_json");
-          //console.log(JSON.stringify(list_json));
-
-          // put object to S3
-          const put_params = {
-            Bucket: bucket_name,
-            Key: key_json,
-            Body: JSON.stringify(list_json)
-          };
-          s3.putObject(put_params, (err, data) => {
-            if (err) {
-              console.error("s3 : put error");
-            } else {
-              console.log('JSON file updated successfully');
-            }
-          });
-        });
+        //console.log("new object");
+        //console.log(newObject);
+        updateListJson(bucket_name, broadcast_id, newObject);
 
         // reply to LINE friend.
         return client.replyMessage(event.replyToken, {
@@ -146,15 +153,38 @@ async function handleEvent(event) {
   if (event.message.type == 'text') {
     if (event.message.text == 'ライブ準備') {
       exec('bash prepare_live.sh', (err, stdout, stderr) => {
+        const broadcat_id = stdout;
+
+        // reply to user
         return client.replyMessage(event.replyToken, {
           type: 'text',
-          text: 'ライブの準備ができました。視聴URLは https://www.youtube.com/watch?v=' + stdout + ' です。コンテンツマッシュアップURLは https://youtube-iframe-player-api-test.s3.ap-northeast-1.amazonaws.com/index.html?id=' + stdout + 'です。'
+          text: 'ライブの準備ができました。視聴URLは https://www.youtube.com/watch?v=' + broadcast_id + ' です。\nコンテンツマッシュアップURLは https://youtube-iframe-player-api-test.s3.ap-northeast-1.amazonaws.com/index.html?id=' + broadcast_id + 'です。'
         });
       });
     }
 
     else if (event.message.text == 'ライブ開始') {
+      const bucket_name = 'youtube-iframe-player-api-test';
+      
+      // start live streaming
       exec('bash start_live.sh');
+
+      // read broadcast_id
+      var broadcast_id;
+      try {
+        broadcast_id = fs.readFileSync('./broadcast_id.txt', 'utf8');
+      } catch (err) {
+        //console.log(err);
+      }
+      
+      // update list.json on S3
+      const newObject = {
+        event: "startlive",
+        backet: bucket_name,
+        time: new Date().toLocaleString('sv')
+      };
+      updateListJson(bucket_name, broadcast_id, newObject);
+
       // このメッセージは即座に返す
       return client.replyMessage(event.replyToken, {
         type: 'text',
@@ -164,6 +194,24 @@ async function handleEvent(event) {
 
     else if (event.message.text == 'ライブ終了') {
       exec('bash stop_live.sh', (err, stdout, stderr) => {
+        const bucket_name = 'youtube-iframe-player-api-test';
+
+        // read broadcast_id
+        var broadcast_id;
+        try {
+          broadcast_id = fs.readFileSync('./broadcast_id.txt', 'utf8');
+        } catch (err) {
+          //console.log(err);
+        }
+        
+        // update list.json on S3
+        const newObject = {
+          event: "stoplive",
+          backet: bucket_name,
+          time: new Date().toLocaleString('sv')
+        };
+        updateListJson(bucket_name, broadcast_id, newObject);
+
         return client.replyMessage(event.replyToken, {
           type: 'text',
           text: 'ライブを終了します'
