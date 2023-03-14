@@ -16,7 +16,7 @@
 
 ~/.aws/credentials
 
-```
+```ini
 [default]
 aws_access_key_id = { AWS Access Key ID }
 aws_secret_access_key = { AWS Secret Access Key }
