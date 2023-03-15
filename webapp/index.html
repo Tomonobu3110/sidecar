@@ -70,6 +70,8 @@
       // 画像要素を追加するDOM要素を取得
       const imageContainer = document.getElementById('image-container');
       
+      var last_files;
+      var start_time;
       async function addImagesFromJson() {
         try {
           fetch(url)
@@ -78,7 +80,6 @@
               console.log(data)
 
               // 画像のURLから画像要素を作成し、DOMに追加
-              var start_time;
               data.files.forEach(imageItem => {
                 console.log(imageItem);
                 console.log(imageItem.event.toString());
@@ -110,8 +111,9 @@
                     imageContainer.appendChild(img);
                   }
                 }
-              });
-          });
+              }); // end of forEach
+              last_files = data.files;
+            });
         } catch (err) {
           console.log(err);
         }
@@ -169,6 +171,58 @@
         player.playVideo();
       }
 
+      // new item checker
+      setInterval(() => {
+        try {
+          fetch(url)
+            .then(response => response.json())
+            .then(data => {
+              // diff check
+              const current_files = data.files;
+/*
+        const newObject = {
+          event: "uploadimage",
+          bucket: "youtube-iframe-player-api-test",
+          key: "SgAK49mtBOA/image.17800396857236.jpg",
+          file: "image.17800396857236.jpg",
+          time: new Date().toLocaleString('sv')
+        };
+        current_files.push(newObject);
+*/
+              const diff = current_files.filter(cf => cf.event === 'uploadimage' && !last_files.some(lf => lf.event === 'uploadimage' && cf.key === lf.key));
+              //console.log(last_files);
+              //console.log(current_files);
+              console.log(diff);
+              last_files = current_files;
+
+              // append image
+              diff.forEach(imageItem => {
+                console.log(imageItem);
+                console.log(imageItem.key.toString());
+                const img_url = base_url + imageItem.key.toString();
+                console.log(img_url);
+                if (img_url.endsWith('.jpg')) {
+                  // diff in second
+                  const date1 = new Date(start_time);
+                  const date2 = new Date(imageItem.time);
+                  const diffInSec = (date2.getTime() - date1.getTime()) / 1000;
+                  //const delay = 40;
+                  const delay = 38;
+
+                  // create image element
+                  const img = document.createElement('img');
+                  img.src = img_url;
+                  img.classList.add('image');
+                  img.addEventListener('click', { sec: diffInSec - delay, handleEvent: seekTo });
+                  imageContainer.appendChild(img);
+                }
+              }); // end of forEach
+
+            });
+        } catch (err) {
+          console.log(err);
+        }
+      }, 3000);
     </script>
   </body>
 </html>
