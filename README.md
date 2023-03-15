@@ -58,7 +58,7 @@ Note that you need to make S3 bucket on AWS to fix the `redirect_uris`.
 
 ./mylinebot/.line_credentials
 
-```shell
+```ini
 CHANNEL_SECRET={ Channel Secret }
 CHANNEL_ACCESS_TOKEN={ Channel Access Token }
 ```
