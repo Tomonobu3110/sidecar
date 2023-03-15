@@ -13,7 +13,7 @@ echo $ACCESS_TOKEN > access_token.txt
 BROADCAST_ID=`cat broadcast_id.txt`
 
 # Transition To complete
-curl --request POST "https://youtube.googleapis.com/youtube/v3/liveBroadcasts/transition?broadcastStatus=complete&id=$BROADCAST_ID&part=id&part=snippet&part=contentDetails&part=status&key=$API_KEY" --header "Authorization: Bearer $ACCESS_TOKEN" --header 'Accept: application/json' --header 'Content-Type: application/json' --compressed
+curl --request POST "https://youtube.googleapis.com/youtube/v3/liveBroadcasts/transition?broadcastStatus=complete&id=$BROADCAST_ID&part=id&part=snippet&part=contentDetails&part=status" --header "Authorization: Bearer $ACCESS_TOKEN" --header 'Accept: application/json' --header 'Content-Type: application/json' --compressed
 
 # Stop ffmpeg
 ps aux | grep raspivid | grep -v grep | grep -v bash | awk '{ print "kill -9", $2 }' | sh

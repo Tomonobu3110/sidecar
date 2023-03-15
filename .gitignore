@@ -1,5 +1,6 @@
 # credentials
-.credentials
+.line_credentials
+#.credentials
 
 # backup files
 *.BAK

@@ -13,9 +13,9 @@ nohup bash -c "raspivid -w 1920 -h 1080 -fps 30 -o - -t 0 -b 2500000 | tee ${BRO
 sleep 10
 
 # Transition To testing
-curl --request POST "https://youtube.googleapis.com/youtube/v3/liveBroadcasts/transition?broadcastStatus=testing&id=$BROADCAST_ID&part=id&part=snippet&part=contentDetails&part=status&key=$API_KEY" --header "Authorization: Bearer $ACCESS_TOKEN" --header 'Accept: application/json' --header 'Content-Type: application/json' --compressed
+curl --request POST "https://youtube.googleapis.com/youtube/v3/liveBroadcasts/transition?broadcastStatus=testing&id=$BROADCAST_ID&part=id&part=snippet&part=contentDetails&part=status" --header "Authorization: Bearer $ACCESS_TOKEN" --header 'Accept: application/json' --header 'Content-Type: application/json' --compressed
 sleep 30
 
 # Transition To live
-curl --request POST "https://youtube.googleapis.com/youtube/v3/liveBroadcasts/transition?broadcastStatus=live&id=$BROADCAST_ID&part=id&part=snippet&part=contentDetails&part=status&key=$API_KEY" --header "Authorization: Bearer $ACCESS_TOKEN" --header 'Accept: application/json' --header 'Content-Type: application/json' --compressed
+curl --request POST "https://youtube.googleapis.com/youtube/v3/liveBroadcasts/transition?broadcastStatus=live&id=$BROADCAST_ID&part=id&part=snippet&part=contentDetails&part=status" --header "Authorization: Bearer $ACCESS_TOKEN" --header 'Accept: application/json' --header 'Content-Type: application/json' --compressed
 
