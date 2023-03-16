@@ -27,6 +27,12 @@
         height: 15%;
         margin-right: 10px;
       }
+      .line_video {
+        flex-shrink: 0;
+        width: 15%;
+        height: 15%;
+        margin-right: 10px;
+      }
     </style>
   </head>
   <body>
@@ -88,7 +94,8 @@
                   start_time = imageItem.time;
                   console.log("Start time is " + start_time);
                 }
-  
+                
+                // 画像を貼る
                 else if (imageItem.event.toString() === "uploadimage") {
                   console.log(imageItem.key.toString());
                   const img_url = base_url + imageItem.key.toString();
@@ -111,6 +118,40 @@
                     imageContainer.appendChild(img);
                   }
                 }
+                
+                // 動画を貼る
+                else if (imageItem.event.toString() === "uploadvideo") {
+                  console.log(imageItem.key.toString());
+                  const video_url = base_url + imageItem.key.toString();
+                  console.log(video_url);
+                  if (video_url.endsWith('.mp4')) {
+                    // diff in second
+                    const date1 = new Date(start_time);
+                    const date2 = new Date(imageItem.time);
+                    const diffInSec = (date2.getTime() - date1.getTime()) / 1000;
+                    //const delay = 40;
+                    const delay = 38;
+
+                    // create image element
+                    const video = document.createElement('video');
+                    video.classList.add('line_video');
+
+                    // source要素を作成
+                    var source = document.createElement("source");
+                    source.src = video_url;
+                    source.type = "video/mp4";
+
+                    // source要素をvideo要素に追加
+                    video.appendChild(source);
+
+                    // プレーヤーに制御ボタンを表示
+                    video.controls = true;
+
+                    video.addEventListener('click', { sec: diffInSec - delay, handleEvent: seekTo });
+                    imageContainer.appendChild(video);
+                  }
+                }
+                
               }); // end of forEach
               last_files = data.files;
             });
@@ -189,14 +230,16 @@
         };
         current_files.push(newObject);
 */
-              const diff = current_files.filter(cf => cf.event === 'uploadimage' && !last_files.some(lf => lf.event === 'uploadimage' && cf.key === lf.key));
+              const img_diff = current_files.filter(cf => cf.event === 'uploadimage' && !last_files.some(lf => lf.event === 'uploadimage' && cf.key === lf.key));
+              const vid_diff = current_files.filter(cf => cf.event === 'uploadvideo' && !last_files.some(lf => lf.event === 'uploadvideo' && cf.key === lf.key));
               //console.log(last_files);
               //console.log(current_files);
-              console.log(diff);
+              console.log(img_diff);
+              console.log(vid_diff);
               last_files = current_files;
 
               // append image
-              diff.forEach(imageItem => {
+              img_diff.forEach(imageItem => {
                 console.log(imageItem);
                 console.log(imageItem.key.toString());
                 const img_url = base_url + imageItem.key.toString();
@@ -216,6 +259,40 @@
                   img.addEventListener('click', { sec: diffInSec - delay, handleEvent: seekTo });
                   imageContainer.appendChild(img);
                 }
+              }); // end of forEach
+
+              // append video
+              vid_diff.forEach(videoItem => {
+                  console.log(videoItem);
+                  console.log(videoItem.key.toString());
+                  const video_url = base_url + videoItem.key.toString();
+                  console.log(video_url);
+                  if (video_url.endsWith('.mp4')) {
+                    // diff in second
+                    const date1 = new Date(start_time);
+                    const date2 = new Date(videoItem.time);
+                    const diffInSec = (date2.getTime() - date1.getTime()) / 1000;
+                    //const delay = 40;
+                    const delay = 38;
+
+                    // create image element
+                    const video = document.createElement('video');
+                    video.classList.add('line_video');
+
+                    // source要素を作成
+                    var source = document.createElement("source");
+                    source.src = video_url;
+                    source.type = "video/mp4";
+
+                    // source要素をvideo要素に追加
+                    video.appendChild(source);
+
+                    // プレーヤーに制御ボタンを表示
+                    video.controls = true;
+
+                    video.addEventListener('click', { sec: diffInSec - delay, handleEvent: seekTo });
+                    imageContainer.appendChild(video);
+                  }
               }); // end of forEach
 
             });

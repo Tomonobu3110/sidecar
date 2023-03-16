@@ -143,11 +143,82 @@ async function handleEvent(event) {
         // reply to LINE friend.
         return client.replyMessage(event.replyToken, {
           type: 'text',
-          text: '画像を受信したのでS3に保存したよ'
+          text: '画像を保存したよ'
         });
       });
     });
   }
+
+  // video message
+  if (event.message.type == 'video' && event.message.contentProvider.type == 'line') {
+    exec("curl -v -X GET https://api-data.line.me/v2/bot/message/" + event.message.id + "/content -H 'Authorization: Bearer " + process.env.CHANNEL_ACCESS_TOKEN + "' --output video." + event.message.id + ".mp4", (err, stdout, stderr) => {
+
+      // read broadcast_id
+      var broadcast_id = "default";
+      try {
+        broadcast_id = fs.readFileSync('./broadcast_id.txt', 'utf8');
+      } catch (err) {
+        //console.log(err);
+      }
+
+      // S3へファイルアップロード
+      // 自動でマルチパートアップロードもやってくれる
+      // https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#upload-property
+      const bucket_name = 'youtube-iframe-player-api-test';
+      const target_file = 'video.' + event.message.id + '.mp4';
+      const key = broadcast_id ? broadcast_id.trimEnd() + '/' + target_file : target_file;
+      //console.log('bucket name : ' + bucket_name);
+      //console.log('target file : ' + target_file);
+      //console.log('key         : ' + key);
+      s3.upload({
+        Bucket: bucket_name,
+        Key: key,
+        Body: fs.createReadStream(path.join(__dirname, target_file)),
+        ContentType: "video/mp4"
+      }, {
+        partSize: 100 * 1024 * 1024,
+        queueSize: 4
+      }, (err, data) => {
+        if (err) {
+          console.log(err);
+          return;
+        }
+        console.log(JSON.stringify(data));
+        
+        // update list.json on S3
+        // - toLocaleString('sv') 
+        //   see : https://qiita.com/oniki_ds/items/df6d84e50afe37538d5c
+        exec("ffmpeg -i " + target_file, (err, stdout, stderr) => {
+        	var lines = stderr.split('\n');
+        	var result = lines.find(line => line.includes('creation_time'));
+        	//console.log(result);
+
+          var sep = result.split(':');
+          var time = sep[1].trim() + ':' + sep[2].trim() + ':' + sep[3].trim();
+          var creation_time = new Date(time);
+        
+          const duration = 'duration' in event.message ? event.message.duration : 10 * 1000;
+          const newObject = {
+            event: "uploadvideo",
+            bucket: bucket_name,
+            key: key,
+            file: target_file,
+            time: creation_time.toLocaleString('sv')
+            //time: new Date(now.getTime() - duration).toLocaleString('sv')
+          };
+          //console.log("new object");
+          //console.log(newObject);
+          updateListJson(bucket_name, broadcast_id, newObject);
+
+          // reply to LINE friend.
+          return client.replyMessage(event.replyToken, {
+            type: 'text',
+            text: '動画を保存したよ'
+          });
+        }); // end of exec("ffmpeg...")
+      }); // end of s3.upload()
+    }); // end of exec("curl...")
+  } // end of if (event.message.type == 'video' ... )
 
   // text message
   if (event.message.type == 'text') {
