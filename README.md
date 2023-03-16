@@ -4,6 +4,7 @@
 
 | directory name | description |
 | ---- | ---- |
+| metadata | show creation_time in metadata of MP4 |
 | mylinebot | Sidecar Line BOT (Backend) |
 | oauth | OAuth2 test code for YouTube API |
 | service | .service files for systemctl and install script |
