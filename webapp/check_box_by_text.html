@@ -1,0 +1,25 @@
+<html>
+  <head>
+    <style>
+      #box {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="box" onclick="changeBox()">■ チェックボックス</div>
+    <script>
+    function changeBox() {
+      var box = document.getElementById("box");
+      if (box.innerHTML == "■ チェックボックス") {
+        box.innerHTML = "□ チェックボックス";
+      } else {
+        box.innerHTML = "■ チェックボックス";
+      }
+    }
+    </script>
+  </body>
+</html>

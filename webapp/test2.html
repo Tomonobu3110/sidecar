@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>YouTube + コメント + 画像</title>
+	<!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
+</head>
+<body>
+  <style>
+    body {
+    	margin: 0;
+    	padding: 0;
+    	font-family: sans-serif;
+    }
+
+    .video-section {
+    	display: flex;
+    	flex-direction: row;
+    	align-items: center;
+    	justify-content: center;
+    	margin-top: 50px;
+    }
+
+    .comment-list {
+    	margin-left: 50px;
+    	list-style: none;
+    	padding: 0;
+    	height: 200px; /* 必要な高さを指定 */
+    	overflow-y: scroll; /* スクロールバーを表示 */
+    }
+
+    .image-section {
+    	display: flex;
+    	flex-direction: row;
+    	overflow-x: scroll;
+    	padding: 10px;
+    }
+
+    /* 通常時のスタイル */
+    .image-section img {
+    	max-width: 100%;
+    	height: auto;
+    	margin-right: 10px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.3);
+      transition: box-shadow 0.3s ease-in-out;
+    }
+
+    /* マウスオーバー時のスタイル */
+    .image-section img:hover {
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+
+    /* クリック時のスタイル */
+    .image-section img:active {
+      box-shadow: none;
+      transform: translateY(2px);
+    }
+  </style>
+	<div class="video-section">
+		<iframe width="560" height="315" src="https://www.youtube.com/embed/VIDEO_ID" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+		<ul class="comment-list">
+			<li>コメント1</li>
+			<li>コメント2</li>
+			<li>コメント3</li>
+			<li>コメント4</li>
+			<li>コメント5</li>
+			<li>コメント6</li>
+			<li>コメント7</li>
+			<li>コメント8</li>
+			<li>コメント9</li>
+			<li>コメント10</li>
+			<li>コメント1</li>
+			<li>コメント2</li>
+			<li>コメント3</li>
+			<li>コメント4</li>
+			<li>コメント5</li>
+			<li>コメント6</li>
+			<li>コメント7</li>
+			<li>コメント8</li>
+			<li>コメント9</li>
+			<li>コメント10</li>
+			<li>コメント1</li>
+			<li>コメント2</li>
+			<li>コメント3</li>
+			<li>コメント4</li>
+			<li>コメント5</li>
+			<li>コメント6</li>
+			<li>コメント7</li>
+			<li>コメント8</li>
+			<li>コメント9</li>
+			<li>コメント10</li>
+			<!-- 短い文字列のリストを表示する -->
+		</ul>
+	</div>
+	<div class="image-section">
+		<img src="https://via.placeholder.com/300x200" alt="画像1">
+		<img src="https://via.placeholder.com/300x200" alt="画像2">
+		<img src="https://via.placeholder.com/300x200" alt="画像3">
+		<img src="https://via.placeholder.com/300x200" alt="画像3">
+		<img src="https://via.placeholder.com/300x200" alt="画像5">
+		<img src="https://via.placeholder.com/300x200" alt="画像6">
+		<img src="https://via.placeholder.com/300x200" alt="画像7">
+		<img src="https://via.placeholder.com/300x200" alt="画像8">
+		<img src="https://via.placeholder.com/300x200" alt="画像9">
+		<!-- 横スクロールする静止画を表示する -->
+	</div>
+</body>
+</html>

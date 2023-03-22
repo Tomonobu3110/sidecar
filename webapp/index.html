@@ -21,17 +21,42 @@
         overflow-x: auto;
         white-space: nowrap;
       }
+      /* 通常時のスタイル */
       .image {
         flex-shrink: 0;
         width: 15%;
         height: 15%;
         margin-right: 10px;
+        margin-bottom: 2px;
+        box-shadow: 0 0 5px rgba(0,0,0,0.3);
+        transition: box-shadow 0.3s ease-in-out;
       }
+      /* マウスオーバー時のスタイル */
+      .image:hover {
+        box-shadow: 0 0 10px rgba(0,0,0,0.8);
+      }
+      /* クリック時のスタイル */
+      .image:active {
+        box-shadow: none;
+        transform: translateY(2px);
+      }
+      /* 動画のスタイル */
       .line_video {
         flex-shrink: 0;
         width: 15%;
         height: 15%;
         margin-right: 10px;
+        box-shadow: 0 0 5px rgba(0,0,0,0.3);
+        transition: box-shadow 0.3s ease-in-out;
+      }
+      /* マウスオーバー時のスタイル */
+      .line_video:hover {
+        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+      }
+      /* クリック時のスタイル */
+      .line_video:active {
+        box-shadow: none;
+        transform: translateY(2px);
       }
     </style>
   </head>
