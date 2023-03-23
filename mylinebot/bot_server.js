@@ -318,6 +318,15 @@ async function handleEvent(event) {
       });
     }
 
+    else if (event.message.text == 'ユーザ削除') {
+      exec('rm sidecar-linebot-oauth2.json', (err, stdout, stderr) => {
+        return client.replyMessage(event.replyToken, {
+          type: 'text',
+          text: 'ユーザを削除しました。もう一度「ユーザ登録」してください'
+        });
+      });
+    }
+
     else if (event.message.text == 'df') {
       exec('df', (err, stdout, stderr) => {
         return client.replyMessage(event.replyToken, {

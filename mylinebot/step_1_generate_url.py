@@ -80,4 +80,6 @@ if __name__ == '__main__':
   if credentials is None or credentials.invalid:
     auth_uri = flow.step1_get_authorize_url()
     print(auth_uri + '&openExternalBrowser=1')
+  elif not credentials.invalid:
+    print("credential is valid")
 
