@@ -9,7 +9,11 @@ ACCESS_TOKEN=`cat access_token.txt`
 BROADCAST_ID=`cat broadcast_id.txt`
 
 # Start ffmpeg
-nohup bash -c "raspivid -w 1920 -h 1080 -fps 30 -o - -t 0 -b 2500000 | tee ${BROADCAST_ID}.h264 | ffmpeg -re -stream_loop -1 -i no_sound-1.mp3 -f h264 -i - -c:v copy -f flv $YOUTUBE_STREAM_URI/$YOUTUBE_STREAM_KEY" &
+VIDEO_WIDTH=1280
+VIDEO_HEIGHT=720
+VIDEO_BITRATE=2500000
+VIDEO_FPS=30
+nohup bash -c "raspivid -w $VIDEO_WIDTH -h $VIDEO_HEIGHT -fps $VIDEO_FPS -o - -t 0 -b $VIDEO_BITRATE | tee ${BROADCAST_ID}.h264 | ffmpeg -re -stream_loop -1 -i no_sound-1.mp3 -f h264 -i - -c:v copy -f flv $YOUTUBE_STREAM_URI/$YOUTUBE_STREAM_KEY" &
 sleep 10
 
 # Transition To testing

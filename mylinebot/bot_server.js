@@ -227,10 +227,20 @@ async function handleEvent(event) {
         const broadcast_id = stdout;
 
         // reply to user
-        return client.replyMessage(event.replyToken, {
-          type: 'text',
-          text: 'ライブの準備ができました。視聴URLは https://www.youtube.com/watch?v=' + broadcast_id + ' です。\nコンテンツマッシュアップURLは https://youtube-iframe-player-api-test.s3.ap-northeast-1.amazonaws.com/index.html?id=' + broadcast_id + 'です。'
-        });
+        return client.replyMessage(event.replyToken, [
+          {
+            type: 'text',
+            text: 'ライブの準備ができました'
+          },
+          {
+            type: 'text',
+            text: '視聴URLは https://www.youtube.com/watch?v=' + broadcast_id + ' です'
+          },
+          {
+            type: 'text',
+            text: 'コンテンツマッシュアップURLは https://youtube-iframe-player-api-test.s3.ap-northeast-1.amazonaws.com/index.html?id=' + broadcast_id + ' です'
+          }
+        ]);
       });
     }
 
@@ -322,7 +332,7 @@ async function handleEvent(event) {
       exec('rm sidecar-linebot-oauth2.json', (err, stdout, stderr) => {
         return client.replyMessage(event.replyToken, {
           type: 'text',
-          text: 'ユーザを削除しました。もう一度「ユーザ登録」してください'
+          text: 'ユーザを削除しました。もう一度「ユーザ登録」を行ってください'
         });
       });
     }
@@ -337,18 +347,48 @@ async function handleEvent(event) {
     }
 
     else if (event.message.text == 'shutdown') {
-      exec('sudo shutdown -h now');
+      setTimeout(() => {
+        exec('sudo shutdown -h now');
+      }, 3000);
       return client.replyMessage(event.replyToken, {
         type: 'text',
         text: 'システムをシャットダウンします。ばいばいーい'
       });
     }
 
-    else {
+    else if (event.message.text == 'reboot') {
+      setTimeout(() => {
+        exec('sudo shutdown -r now');
+      }, 3000);
       return client.replyMessage(event.replyToken, {
         type: 'text',
-        text: '(' + event.message.text + ')' //実際に返信の言葉を入れる箇所
+        text: 'システムを再起動します。ばいばいーい'
       });
+    }
+
+    else if (event.message.text == 'ヘルプ') {
+      return client.replyMessage(event.replyToken, [
+        {
+          type: 'text',
+          text: 'ユーザ登録、ユーザ削除、ライブ準備、ライブ開始、ライブ終了、アップロード、df、shutdown、reboot がコマンドとして用意されています'
+        },
+        {
+          type: 'text',
+          text: 'また、ライブ中にLINEで画像や動画を撮影して送るとライブ映像にマッシュアップされます'
+        }
+      ]);
+    }
+    else {
+      return client.replyMessage(event.replyToken, [
+        {
+          type: 'text',
+          text: event.message.text
+        },
+        {
+          type: 'text',
+          text: 'ヘルプでコマンド一覧を表示します' //実際に返信の言葉を入れる箇所
+        }
+      ]);
     }
   } // end of text message handling block
 
