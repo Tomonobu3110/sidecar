@@ -4,6 +4,19 @@
     <meta charset='utf-8'>
     <title>斎藤友の YouTube IFrame Player API のテストサイトへようこそ！</title>
     <style>
+      /* ヘッダ */
+  		header {
+  			display: flex;
+  			justify-content: space-between;
+  			align-items: center;
+  			background-color: white;
+  			height: 55px;
+  		}
+
+  		header img {
+  			height: 100%;
+  		}
+
       /* タイトルのスタイル */
       .title {
         text-align: center;
@@ -68,8 +81,12 @@
     </style>
   </head>
   <body>
+  	<header>
+  		<img src="header_left.png" alt="header-left">
+  		<img src="header_right.png" alt="header-right">
+  	</header>
     <!-- タイトル -->
-    <h1 class="title"><div id='broadcast_id'>動画IDは a4XdAOxSLxs です</div></h1>
+    <h2 class="title"><div id='broadcast_id'>動画IDは a4XdAOxSLxs です</div></h1>
     
     <!-- YouTube動画 -->
     <!-- 1. The <iframe> (and video player) will replace this <div> tag. -->
