@@ -21,20 +21,8 @@
         overflow-x: auto;
         white-space: nowrap;
       }
-
-      /* コンテナ：通常時のスタイル */
-      .container {
-        flex-shrink: 0;
-        width: 200px;
-        height: 200px;
-        margin-right: 10px;
-        margin-bottom: 2px;
-        overflow: hidden;
-        border: 1px solid #ccc;
-        box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
-        transition: box-shadow 0.3s ease-in-out;
-        background: ivory;
-/*
+      /* 通常時のスタイル */
+      .image {
         flex-shrink: 0;
         width: 15%;
         height: 15%;
@@ -42,28 +30,33 @@
         margin-bottom: 2px;
         box-shadow: 0 0 5px rgba(0,0,0,0.3);
         transition: box-shadow 0.3s ease-in-out;
-*/
       }
-      /* コンテナ：マウスオーバー時のスタイル */
-      .container:hover {
+      /* マウスオーバー時のスタイル */
+      .image:hover {
         box-shadow: 0 0 10px rgba(0,0,0,0.8);
       }
-      /* コンテナ：クリック時のスタイル */
-      .container:active {
+      /* クリック時のスタイル */
+      .image:active {
         box-shadow: none;
         transform: translateY(2px);
       }
-      /* 画像のスタイル */
-      .container img {
-        object-fit: contain;
-        width: 100%;
-        height: 100%;
-      }
       /* 動画のスタイル */
-      .container video {
-        object-fit: contain;
-        width: 100%;
-        height: 100%;
+      .line_video {
+        flex-shrink: 0;
+        width: 15%;
+        height: 15%;
+        margin-right: 10px;
+        box-shadow: 0 0 5px rgba(0,0,0,0.3);
+        transition: box-shadow 0.3s ease-in-out;
+      }
+      /* マウスオーバー時のスタイル */
+      .line_video:hover {
+        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+      }
+      /* クリック時のスタイル */
+      .line_video:active {
+        box-shadow: none;
+        transform: translateY(2px);
       }
     </style>
   </head>
@@ -139,19 +132,15 @@
                     const diffInSec = (date2.getTime() - date1.getTime()) / 1000;
                     //const delay = 40;
                     const delay = 38;
-                    
-                    // create div element (container)
-                    const div = document.createElement('div');
-                    div.classList.add('container');
 
                     // create image element
                     const img = document.createElement('img');
                     img.src = img_url;
                     img.classList.add('image');
+                    //img.style.width = "10%";
+                    //img.style.height = "10%";
                     img.addEventListener('click', { sec: diffInSec - delay, handleEvent: seekTo });
-
-                    div.appendChild(img);
-                    imageContainer.appendChild(div);
+                    imageContainer.appendChild(img);
                   }
                 }
                 
@@ -168,11 +157,7 @@
                     //const delay = 40;
                     const delay = 38;
 
-                    // create div element (container)
-                    const div = document.createElement('div');
-                    div.classList.add('container');
-
-                    // create video element
+                    // create image element
                     const video = document.createElement('video');
                     video.classList.add('line_video');
 
@@ -188,9 +173,7 @@
                     video.controls = true;
 
                     video.addEventListener('click', { sec: diffInSec - delay, handleEvent: seekTo });
-
-                    div.appendChild(video);
-                    imageContainer.appendChild(div);
+                    imageContainer.appendChild(video);
                   }
                 }
                 
