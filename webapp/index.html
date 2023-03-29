@@ -2,7 +2,8 @@
 <html>
   <head>
     <meta charset='utf-8'>
-    <title>斎藤友の YouTube IFrame Player API のテストサイトへようこそ！</title>
+    <title>サイドカー | Creators' Cloud</title>
+    <link href="http://fonts.googleapis.com/earlyaccess/notosansjp.css">
     <style>
       /* ヘッダ */
   		header {
@@ -20,7 +21,9 @@
       /* タイトルのスタイル */
       .title {
         text-align: center;
+        font-family: 'Noto Sans JP', sans-serif;
       }
+
       /* YouTube動画のスタイル */
       .video {
         margin: 0 auto;
@@ -28,6 +31,14 @@
         width: 640px;
         height: 360px;
       }
+
+      /* 時刻のスタイル */
+      .time_container {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
       /* 画像一覧のスタイル */
       .image-container {
         display: flex;
@@ -44,7 +55,7 @@
         margin-bottom: 2px;
         overflow: hidden;
         border: 1px solid #ccc;
-        box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
         transition: box-shadow 0.3s ease-in-out;
         background: ivory;
 /*
@@ -66,12 +77,14 @@
         box-shadow: none;
         transform: translateY(2px);
       }
+
       /* 画像のスタイル */
       .container img {
         object-fit: contain;
         width: 100%;
         height: 100%;
       }
+
       /* 動画のスタイル */
       .container video {
         object-fit: contain;
@@ -86,17 +99,96 @@
   		<img src="header_right.png" alt="header-right">
   	</header>
     <!-- タイトル -->
-    <h2 class="title"><div id='broadcast_id'>動画IDは a4XdAOxSLxs です</div></h1>
+    <h2 class="title"><div id='broadcast_id'>ライブのIDは a4XdAOxSLxs です</div></h1>
     
     <!-- YouTube動画 -->
     <!-- 1. The <iframe> (and video player) will replace this <div> tag. -->
     <div id="player"></div> <!-- ★ ここが <iframe> に置換される -->
     
+    <!-- 動画時刻 -->
+    <div id='current_time' class='time_container'>
+      <span id='current_status' class='player_status' style='color:gray'>wait...</span>
+      <select id="hour" name="hour">
+        <option value="00">0</option>
+        <option value="01">1</option>
+        <option value="02">2</option>
+        <option value="03">3</option>
+        <option value="04">4</option>
+        <option value="05">5</option>
+        <option value="06">6</option>
+        <option value="07">7</option>
+        <option value="08">8</option>
+        <option value="09">9</option>
+        <option value="10">10</option>
+        <option value="11">11</option>
+        <option value="12">12</option>
+        <option value="13">13</option>
+        <option value="14">14</option>
+        <option value="15">15</option>
+        <option value="16">16</option>
+        <option value="17">17</option>
+        <option value="18">18</option>
+        <option value="19">19</option>
+        <option value="20">20</option>
+        <option value="21">21</option>
+        <option value="22">22</option>
+        <option value="23">23</option>
+      </select>
+      <label for="hour">時</label>
+
+      <select id="minute" name="minute">
+        <option value="00">0</option>
+        <option value="10">1</option>
+        <option value="20">2</option>
+        <option value="30">3</option>
+        <option value="40">4</option>
+        <option value="50">5</option>
+      </select>
+      <select id="minute2" name="minute2">
+        <option value="00">0</option>
+        <option value="01">1</option>
+        <option value="02">2</option>
+        <option value="03">3</option>
+        <option value="04">4</option>
+        <option value="05">5</option>
+        <option value="06">6</option>
+        <option value="07">7</option>
+        <option value="08">8</option>
+        <option value="09">9</option>
+      </select>
+      <label for="minute">分</label>
+
+      <select id="second" name="second">
+        <option value="00">0</option>
+        <option value="10">1</option>
+        <option value="20">2</option>
+        <option value="30">3</option>
+        <option value="40">4</option>
+        <option value="50">5</option>
+      </select>
+      <select id="second2" name="second2">
+        <option value="00">0</option>
+        <option value="01">1</option>
+        <option value="02">2</option>
+        <option value="03">3</option>
+        <option value="04">4</option>
+        <option value="05">5</option>
+        <option value="06">6</option>
+        <option value="07">7</option>
+        <option value="08">8</option>
+        <option value="09">9</option>
+      </select>
+      <label for="second">秒</label>
+      <button id='apply' onclick='applyCurrentTime()' disabled>apply</button>
+    </div>
+    <br>
+
     <hr>
 
     <!-- 画像一覧 -->
     <div class="image-container" id="image-container"></div>
 
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.963.0.min.js"></script>
     <script>
       // URLのクエリパラメータをパースする
       const urlParams = new URLSearchParams(window.location.search);
@@ -107,15 +199,9 @@
       // IDで指定された<div>要素を取得する
       const divElement = document.getElementById('broadcast_id');
 
-      // <div>要素の中の文字列を取得する
-      //const divText = divElement.innerHTML;
-
-      // 置換を行う
-      //const replacedText = divText.replace("置換前の文字列", "置換後の文字列");
-
       // <div>要素の中の文字列を置換された文字列に更新する
       if (id) {
-        divElement.innerHTML = '動画IDは ' + id + ' です';
+        divElement.innerHTML = 'ライブのIDは ' + id + ' です';
       }
       
       // JSONファイルのURLを指定
@@ -142,6 +228,7 @@
                 if (imageItem.event.toString() === "startlive") {
                   start_time = imageItem.time;
                   console.log("Start time is " + start_time);
+                  setTimeToUI(start_time);
                 }
                 
                 // 画像を貼る
@@ -261,6 +348,7 @@
           done = true;
         }
       }
+
       function stopVideo() {
         // player.stopVideo(); // ★ 再生停止
       }
@@ -311,12 +399,18 @@
                   //const delay = 40;
                   const delay = 38;
 
+                  // create div element (container)
+                  const div = document.createElement('div');
+                  div.classList.add('container');
+
                   // create image element
                   const img = document.createElement('img');
                   img.src = img_url;
                   img.classList.add('image');
                   img.addEventListener('click', { sec: diffInSec - delay, handleEvent: seekTo });
-                  imageContainer.appendChild(img);
+
+                  div.appendChild(img);
+                  imageContainer.appendChild(div);
                 }
               }); // end of forEach
 
@@ -334,7 +428,11 @@
                     //const delay = 40;
                     const delay = 38;
 
-                    // create image element
+                    // create div element (container)
+                    const div = document.createElement('div');
+                    div.classList.add('container');
+
+                    // create video element
                     const video = document.createElement('video');
                     video.classList.add('line_video');
 
@@ -350,7 +448,9 @@
                     video.controls = true;
 
                     video.addEventListener('click', { sec: diffInSec - delay, handleEvent: seekTo });
-                    imageContainer.appendChild(video);
+
+                    div.appendChild(video);
+                    imageContainer.appendChild(div);
                   }
               }); // end of forEach
 
@@ -359,6 +459,68 @@
           console.log(err);
         }
       }, 3000);
+
+      // 時刻UIを更新する (pos = 調整秒)
+      function setTimeToUI(start_time, pos) {
+        // 表示ベース時刻を取得
+        const now = start_time ? new Date(start_time) : new Date();
+        if (pos && pos > 0) {
+          now.setSeconds(now.getSeconds() + pos);
+        }
+
+        // 時、分、秒を取得
+        const hour = now.getHours();
+        const minute = now.getMinutes();
+        const second = now.getSeconds();
+
+        // セレクトボックスの値を設定
+        document.getElementById('hour').value    = ('0' + hour).slice(-2);
+        document.getElementById('minute').value  = ('0' + Math.floor(minute/10)*10).slice(-2);
+        document.getElementById('minute2').value = ('0' + minute%10).slice(-2);
+        document.getElementById('second').value  = ('0' + Math.floor(second/10)*10).slice(-2);
+        document.getElementById('second2').value = ('0' + second%10).slice(-2);
+      }
+
+      // 動画再生時刻を定期的にUIに表示する
+      const status = document.getElementById('current_status');
+      const button = document.getElementById('apply');
+      setInterval(() => {
+        if (typeof start_time === 'string' && start_time.length > 0) {
+          if (player && 1 == player.getPlayerState()) {
+            setTimeToUI(start_time, player.getCurrentTime());
+            status.innerHTML = '▶';
+            status.style.color = 'red';
+            button.disabled = true;
+          } else {
+            status.innerHTML = '■';
+            status.style.color = 'black';
+            button.disabled = false;
+          }
+        } else {
+          // setTimeToUI(); // current time for debug
+          status.innerHTML = '×';
+          status.style.color = 'gray';
+            button.disabled = true;
+        }
+      }, 1000);
+
+      // 動画の開始時刻を設定する
+      function applyCurrentTime() {
+        console.log(start_time); // 2023-03-14 14:43:30
+        const hour = document.getElementById('hour').value * 1.0;
+        const min  = (document.getElementById('minute').value * 1.0) + (document.getElementById('minute2').value * 1.0);
+        const sec  = (document.getElementById('second').value * 1.0) + (document.getElementById('second2').value * 1.0);
+        
+        var date = new Date(start_time);
+        date.setHours(hour);
+        date.setMinutes(min);
+        date.setSeconds(sec);
+        console.log("specified time : " + date.toLocaleString('sv'));
+
+        date.setSeconds(date.getSeconds() - player.getCurrentTime());
+        console.log("new start time : " + date.toLocaleString('sv'));
+      }
+
     </script>
   </body>
 </html>

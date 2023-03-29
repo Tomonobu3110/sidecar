@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <title>S3 upload test</title>
+  </head>
+  <body>
+    <input type=file id='fileInput' disable>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.963.0.min.js"></script>
+    <script>
+      var access_key_id;
+      var secret_access_key;
+
+      // S3へのアップロード用の関数
+      function uploadToS3(file) {
+        // AWSの認証情報を設定
+        AWS.config.update({
+          accessKeyId: access_key_id,
+          secretAccessKey: secret_access_key,
+          region: "ap-northeast-1",
+        });
+
+        // S3のインスタンスを作成
+        var s3 = new AWS.S3();
+
+        // S3にアップロードするためのパラメータを設定
+        var params = {
+          Bucket: 'youtube-iframe-player-api-test',
+          Key: file.name,
+          Body: file,
+        };
+
+        // S3にオブジェクトをアップロード
+        s3.putObject(params, function (err, data) {
+          if (err) {
+            console.log(err, err.stack);
+          } else {
+            console.log('S3アップロード完了:', data);
+          }
+        });
+      }
+
+      // ファイルの選択とアップロードを実行する
+      var fileInput = document.getElementById('fileInput');
+      fileInput.addEventListener('change', function (event) {
+        var file = event.target.files[0];
+        uploadToS3(file);
+      });
+
+      fetch('credentials.json')
+        .then(response => response.json())
+        .then(data => {
+          console.log(data);
+          access_key_id = data.accessKeyId;
+          secret_access_key = data.secretAccessKey;
+          document.getElementById('fileInput').disabled = false;
+        })
+        .catch(error => console.error(error));
+
+    </script>
+  </body>
+</html>
+
