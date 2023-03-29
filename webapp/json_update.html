@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <title>Json update サンプル</title>
+  </head>
+  <body>
+    <button id='fetch_and_update' onclick='fetchAndUpdate()'>Fetch and update</button>
+
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.963.0.min.js"></script>
+    <script>
+      // ターゲットのID
+      const id = 'xeYZANXmq5g';
+      // JSONファイルのURLを指定
+      const base_url = 'https://youtube-iframe-player-api-test.s3.ap-northeast-1.amazonaws.com/';
+      const url = base_url + id + '/list.json';
+      const new_key = id + '/updated_list.json';
+
+      function fetchAndUpdate() {
+        fetch(url)
+          .then(response => response.json())
+          .then(data => {
+            console.log(data)
+
+            // 画像のURLから画像要素を作成し、DOMに追加
+            data.files.forEach(imageItem => {
+              console.log(imageItem);
+              console.log(imageItem.event.toString());
+
+              if (imageItem.event.toString() === "startlive") {
+                start_time = imageItem.time;
+                console.log("Start time is " + start_time);
+                
+                imageItem.time = "2023-03-15 00:00:00";
+              }
+            }); // end of forEach
+
+            // show updated data
+            console.log(data);
+            
+            // AWSクレデンシャルの入手
+            fetch('credentials.json')
+              .then(response => response.json())
+              .then(creds => {
+                console.log(creds);
+                const access_key_id = creds.accessKeyId;
+                const secret_access_key = creds.secretAccessKey;
+
+                // AWSの認証情報を設定
+                AWS.config.update({
+                  accessKeyId: access_key_id,
+                  secretAccessKey: secret_access_key,
+                  region: "ap-northeast-1",
+                });
+
+                // S3のインスタンスを作成
+                var s3 = new AWS.S3();
+
+                // S3にアップロードするためのパラメータを設定
+                var params = {
+                  Bucket: 'youtube-iframe-player-api-test',
+                  Key: new_key,
+                  Body: JSON.stringify(data),
+                };
+
+                // S3にオブジェクトをアップロード
+                s3.putObject(params, function (err, data) {
+                  if (err) {
+                    console.log(err, err.stack);
+                  } else {
+                    console.log('S3アップロード完了:', data);
+                  }
+                });
+                
+              })
+              .catch(error => console.error(error)); // end of fetch ('credential.json')
+
+          })
+          .catch(error => console.log(error)); // end of fetch (url)
+      } // end of function
+
+    </script>
+  </body>
+</html>

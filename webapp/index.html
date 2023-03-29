@@ -58,15 +58,6 @@
         box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
         transition: box-shadow 0.3s ease-in-out;
         background: ivory;
-/*
-        flex-shrink: 0;
-        width: 15%;
-        height: 15%;
-        margin-right: 10px;
-        margin-bottom: 2px;
-        box-shadow: 0 0 5px rgba(0,0,0,0.3);
-        transition: box-shadow 0.3s ease-in-out;
-*/
       }
       /* コンテナ：マウスオーバー時のスタイル */
       .container:hover {
@@ -213,6 +204,7 @@
       
       var last_files;
       var start_time;
+      var fixed = false;
       async function addImagesFromJson() {
         try {
           fetch(url)
@@ -227,7 +219,8 @@
 
                 if (imageItem.event.toString() === "startlive") {
                   start_time = imageItem.time;
-                  console.log("Start time is " + start_time);
+                  fixed      = imageItem.fixed ? imageItem.fixed : false;
+                  console.log("Start time is " + start_time + " / fixed = " + fixed);
                   setTimeToUI(start_time);
                 }
                 
@@ -242,7 +235,7 @@
                     const date2 = new Date(imageItem.time);
                     const diffInSec = (date2.getTime() - date1.getTime()) / 1000;
                     //const delay = 40;
-                    const delay = 38;
+                    const delay = fixed ? 0 : 38;
                     
                     // create div element (container)
                     const div = document.createElement('div');
@@ -270,7 +263,7 @@
                     const date2 = new Date(imageItem.time);
                     const diffInSec = (date2.getTime() - date1.getTime()) / 1000;
                     //const delay = 40;
-                    const delay = 38;
+                    const delay = fixed ? 0 : 38;
 
                     // create div element (container)
                     const div = document.createElement('div');
@@ -397,7 +390,7 @@
                   const date2 = new Date(imageItem.time);
                   const diffInSec = (date2.getTime() - date1.getTime()) / 1000;
                   //const delay = 40;
-                  const delay = 38;
+                  const delay = fixed ? 0 : 38;
 
                   // create div element (container)
                   const div = document.createElement('div');
@@ -426,7 +419,7 @@
                     const date2 = new Date(videoItem.time);
                     const diffInSec = (date2.getTime() - date1.getTime()) / 1000;
                     //const delay = 40;
-                    const delay = 38;
+                    const delay = fixed ? 0 : 38;
 
                     // create div element (container)
                     const div = document.createElement('div');
@@ -519,6 +512,62 @@
 
         date.setSeconds(date.getSeconds() - player.getCurrentTime());
         console.log("new start time : " + date.toLocaleString('sv'));
+
+        console.log(last_files);
+        last_files.forEach(item => {
+            if (item.event.toString() === "startlive") {
+                item.time = date.toLocaleString('sv');
+                item.fixed = true;
+            }
+        });
+
+        // updated list.json
+        const updated_json = {
+          files: last_files
+        };
+        console.log(updated_json);
+
+        // AWSクレデンシャルの入手
+        fetch('credentials.json')
+          .then(response => response.json())
+          .then(creds => {
+            console.log(creds);
+            const access_key_id = creds.accessKeyId;
+            const secret_access_key = creds.secretAccessKey;
+
+            // AWSの認証情報を設定
+            AWS.config.update({
+              accessKeyId: access_key_id,
+              secretAccessKey: secret_access_key,
+              region: "ap-northeast-1",
+            });
+
+            // S3のインスタンスを作成
+            var s3 = new AWS.S3();
+
+            // S3にアップロードするためのパラメータを設定
+            var params = {
+              Bucket: 'youtube-iframe-player-api-test',
+              // Key: id + '/updated_list.json',
+              Key: id + '/list.json',
+              Body: JSON.stringify(updated_json),
+            };
+
+            // S3にオブジェクトをアップロード
+            s3.putObject(params, function (err, data) {
+              if (err) {
+                console.log(err, err.stack);
+              } else {
+                console.log('S3アップロード完了:', data);
+                
+                // ページリロード
+                location.reload();
+              }
+            });
+            
+          })
+          .catch(error => console.error(error)); // end of fetch ('credential.json')
+
       }
 
     </script>
