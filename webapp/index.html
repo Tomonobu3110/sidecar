@@ -235,7 +235,7 @@
                     const date2 = new Date(imageItem.time);
                     const diffInSec = (date2.getTime() - date1.getTime()) / 1000;
                     //const delay = 40;
-                    const delay = fixed ? 0 : 38;
+                    const delay = fixed ? 5 : 38;
                     
                     // create div element (container)
                     const div = document.createElement('div');
@@ -263,7 +263,7 @@
                     const date2 = new Date(imageItem.time);
                     const diffInSec = (date2.getTime() - date1.getTime()) / 1000;
                     //const delay = 40;
-                    const delay = fixed ? 0 : 38;
+                    const delay = fixed ? 5 : 38;
 
                     // create div element (container)
                     const div = document.createElement('div');
@@ -390,7 +390,7 @@
                   const date2 = new Date(imageItem.time);
                   const diffInSec = (date2.getTime() - date1.getTime()) / 1000;
                   //const delay = 40;
-                  const delay = fixed ? 0 : 38;
+                  const delay = fixed ? 5 : 38;
 
                   // create div element (container)
                   const div = document.createElement('div');
@@ -419,7 +419,7 @@
                     const date2 = new Date(videoItem.time);
                     const diffInSec = (date2.getTime() - date1.getTime()) / 1000;
                     //const delay = 40;
-                    const delay = fixed ? 0 : 38;
+                    const delay = fixed ? 5 : 38;
 
                     // create div element (container)
                     const div = document.createElement('div');
@@ -495,7 +495,7 @@
           status.style.color = 'gray';
             button.disabled = true;
         }
-      }, 1000);
+      }, 500);
 
       // 動画の開始時刻を設定する
       function applyCurrentTime() {
@@ -567,9 +567,7 @@
             
           })
           .catch(error => console.error(error)); // end of fetch ('credential.json')
-
       }
-
     </script>
   </body>
 </html>
