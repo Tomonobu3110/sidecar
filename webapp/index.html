@@ -28,8 +28,8 @@
       .video {
         margin: 0 auto;
         display: block;
-        width: 640px;
-        height: 360px;
+        width: 960px;
+        height: 540px;
       }
 
       /* 時刻のスタイル */
@@ -315,8 +315,8 @@
         const container = document.getElementById('player');
         container.classList.add('video');
         player = new YT.Player(container, { 
-          height: '360',
-          width: '640',
+          //width:  '640',
+          //height: '360',
           class: 'video',
           videoId: id ? id : 'a4XdAOxSLxs', // ★ Broadcast ID
           events: {

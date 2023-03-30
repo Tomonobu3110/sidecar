@@ -139,7 +139,8 @@ async function handleEvent(event) {
           key: key,
           file: target_file,
           time: new Date(event.timestamp).toLocaleString('sv'),
-          line_timestamp: event.timestamp
+          line_timestamp: event.timestamp,
+          line_time: new Date(event.timestamp).toLocaleString('sv')
         };
         //console.log("new object");
         //console.log(newObject);
@@ -208,9 +209,12 @@ async function handleEvent(event) {
             bucket: bucket_name,
             key: key,
             file: target_file,
-            time: creation_time.toLocaleString('sv')
+            time: creation_time.toLocaleString('sv'),
             //time: new Date(now.getTime() - duration).toLocaleString('sv')
             //time: new Date(event.message.timestamp).toLocaleString('sv')
+            duration: duration,
+            line_timestamp: event.timestamp,
+            line_time: new Date(event.timestamp).toLocaleString('sv'),
           };
           //console.log("new object");
           //console.log(newObject);
@@ -244,7 +248,7 @@ async function handleEvent(event) {
           },
           {
             type: 'text',
-            text: 'コンテンツマッシュアップURLは https://youtube-iframe-player-api-test.s3.ap-northeast-1.amazonaws.com/index.html?id=' + broadcast_id + ' です'
+            text: 'コンテンツマッシュアップURLは https://youtube-iframe-player-api-test.s3.ap-northeast-1.amazonaws.com/index.html?id=' + broadcast_id.trim() + '&openExternalBrowser=1 です'
           }
         ]);
       });
