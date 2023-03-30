@@ -126,6 +126,10 @@ async function handleEvent(event) {
         }
         console.log(JSON.stringify(data));
         
+        // timestamp
+        console.log("event.message.timestamp --> " + event.timestamp);
+        console.log("time --> " + new Date(event.timestamp).toLocaleString('sv'));
+
         // update list.json on S3
         // - toLocaleString('sv') 
         //   see : https://qiita.com/oniki_ds/items/df6d84e50afe37538d5c
@@ -134,7 +138,8 @@ async function handleEvent(event) {
           bucket: bucket_name,
           key: key,
           file: target_file,
-          time: new Date().toLocaleString('sv')
+          time: new Date(event.timestamp).toLocaleString('sv'),
+          line_timestamp: event.timestamp
         };
         //console.log("new object");
         //console.log(newObject);
@@ -205,6 +210,7 @@ async function handleEvent(event) {
             file: target_file,
             time: creation_time.toLocaleString('sv')
             //time: new Date(now.getTime() - duration).toLocaleString('sv')
+            //time: new Date(event.message.timestamp).toLocaleString('sv')
           };
           //console.log("new object");
           //console.log(newObject);
