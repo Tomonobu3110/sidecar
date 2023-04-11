@@ -384,7 +384,50 @@ async function handleEvent(event) {
         },
         {
           type: 'text',
-          text: 'また、ライブ中にLINEで画像や動画を撮影して送るとライブ映像にマッシュアップされます'
+          text: 'また、ライブ中にLINEで画像や動画を撮影して送るとライブ映像にマッシュアップされます',
+          quickReply: {
+            items: [
+              {
+                type: 'action',
+                action: {
+                  type: 'camera',
+                  label: 'カメラ',
+                }
+              },
+              {
+                type: 'action',
+                action: {
+                  type: 'message',
+                  label: 'ライブ準備',
+                  text: 'ライブ準備'
+                }
+              },
+              {
+                type: 'action',
+                action: {
+                  type: 'message',
+                  label: 'ライブ開始',
+                  text: 'ライブ開始'
+                }
+              },
+              {
+                type: 'action',
+                action: {
+                  type: 'message',
+                  label: 'ライブ終了',
+                  text: 'ライブ終了'
+                }
+              },
+              {
+                type: 'action',
+                action: {
+                  type: 'message',
+                  label: 'アップロード',
+                  text: 'アップロード'
+                }
+              },
+            ]
+          } // end of quickReply
         }
       ]);
     }
@@ -396,7 +439,58 @@ async function handleEvent(event) {
         },
         {
           type: 'text',
-          text: 'ヘルプでコマンド一覧を表示します' //実際に返信の言葉を入れる箇所
+          text: 'ヘルプでコマンド一覧を表示します',
+          quickReply: {
+            items: [
+              {
+                type: 'action',
+                action: {
+                  type: 'message',
+                  label: 'ヘルプ',
+                  text: 'ヘルプ'
+                }
+              },
+              {
+                type: 'action',
+                action: {
+                  type: 'camera',
+                  label: 'カメラ',
+                }
+              },
+              {
+                type: 'action',
+                action: {
+                  type: 'message',
+                  label: 'ライブ準備',
+                  text: 'ライブ準備'
+                }
+              },
+              {
+                type: 'action',
+                action: {
+                  type: 'message',
+                  label: 'ライブ開始',
+                  text: 'ライブ開始'
+                }
+              },
+              {
+                type: 'action',
+                action: {
+                  type: 'message',
+                  label: 'ライブ終了',
+                  text: 'ライブ終了'
+                }
+              },
+              {
+                type: 'action',
+                action: {
+                  type: 'message',
+                  label: 'アップロード',
+                  text: 'アップロード'
+                }
+              },
+            ]
+          } // end of quickReply
         }
       ]);
     }
