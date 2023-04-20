@@ -390,6 +390,22 @@ async function handleEvent(event) {
               {
                 type: 'action',
                 action: {
+                  type: 'message',
+                  label: 'ユーザ登録',
+                  text: 'ユーザ登録'
+                }
+              },
+              {
+                type: 'action',
+                action: {
+                  type: 'message',
+                  label: 'ユーザ削除',
+                  text: 'ユーザ削除'
+                }
+              },
+              {
+                type: 'action',
+                action: {
                   type: 'camera',
                   label: 'カメラ',
                 }
@@ -424,6 +440,22 @@ async function handleEvent(event) {
                   type: 'message',
                   label: 'アップロード',
                   text: 'アップロード'
+                }
+              },
+              {
+                type: 'action',
+                action: {
+                  type: 'message',
+                  label: 'shutdown',
+                  text: 'shutdown'
+                }
+              },
+              {
+                type: 'action',
+                action: {
+                  type: 'message',
+                  label: 'reboot',
+                  text: 'reboot'
                 }
               },
             ]
