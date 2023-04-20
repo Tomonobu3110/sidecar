@@ -5,3 +5,7 @@
 # backup files
 *.BAK
 
+# video folder
+video/
+
+
