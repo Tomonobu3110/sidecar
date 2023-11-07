@@ -25,4 +25,8 @@ node_modules/
 # image files
 *.jpg
 
+# vim swap file
+*.swp
+
+
 

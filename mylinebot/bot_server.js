@@ -25,12 +25,17 @@ var s3 = new AWS.S3();
 // Google(YouTube) credentials
 const credentials_google = "sidecar-linebot-oauth2.json"
 
+// global variables
+var G_ACCESS_TOKEN = "";
+var G_BROADCAST_ID = "";
+
 // Function to create new date in the specified format
 function getFormattedDate() {
   const now = new Date();
   return now.toISOString().slice(0, 19) + '.000Z';
 }
 
+// [YouTube API] Prepare YouTube Live
 async function prepare_youtube_live() {
   try {
     var data = fs.readFileSync(credentials_google, 'utf8');
@@ -54,6 +59,7 @@ async function prepare_youtube_live() {
       params: requestData1
     });
     const ACCESS_TOKEN = response1.data.access_token;
+    G_ACCESS_TOKEN = ACCESS_TOKEN;
     fs.writeFileSync('access_token.txt', ACCESS_TOKEN);
     console.log('Access token saved to access_token.txt:', ACCESS_TOKEN);
       
@@ -83,6 +89,7 @@ async function prepare_youtube_live() {
     );
     //console.log(response2);
     const BROADCAST_ID = response2.data.id;
+    G_BROADCAST_ID = BROADCAST_ID;
     fs.writeFileSync('broadcast_id.txt', BROADCAST_ID);
     console.log('Broadcast ID saved to broadcast_id.txt');
 
@@ -132,6 +139,50 @@ async function prepare_youtube_live() {
   }
 }
 
+// [YouTube API] Start YouTube Live
+async function start_youtube_live(access_token, broadcast_id) {
+  try {
+    console.log("start youtube live : 1");
+    await my_sleep(10 * 1000);
+    console.log("start youtube live : 2");
+
+    const response = await axios.post(`https://youtube.googleapis.com/youtube/v3/liveBroadcasts/transition?broadcastStatus=testing&id=${broadcast_id}&part=id&part=snippet&part=contentDetails&part=status`, null, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    });
+    console.log('Transition successful:', response.data);
+
+    await my_sleep(30 * 1000);
+
+    const response2 = await axios.post(`https://youtube.googleapis.com/youtube/v3/liveBroadcasts/transition?broadcastStatus=live&id=${broadcast_id}&part=id&part=snippet&part=contentDetails&part=status`, null, {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    });
+    console.log('Transition to live successful:', response2.data);
+
+    // fin.
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+function my_sleep(time) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve();
+    }, time);
+  });
+}
+
+//
+// Web Server (Line Bot)
+//
 const app = express();
 
 app.get('/', (req, res) => res.send('Hello LINE BOT!(GET)')); //ブラウザ確認用(無くても問題ない)
@@ -370,23 +421,18 @@ async function handleEvent(event) {
       const bucket_name = 'youtube-iframe-player-api-test';
       
       // start live streaming
-      exec('bash start_live.sh');
-
-      // read broadcast_id
-      var broadcast_id;
-      try {
-        broadcast_id = fs.readFileSync('./broadcast_id.txt', 'utf8');
-      } catch (err) {
-        //console.log(err);
-      }
+      exec('bash start_live.sh'); // no return from shell. (I don't know why)
       
-      // update list.json on S3
-      const newObject = {
-        event: "startlive",
-        backet: bucket_name,
-        time: new Date().toLocaleString('sv')
-      };
-      updateListJson(bucket_name, broadcast_id, newObject);
+      start_youtube_live(G_ACCESS_TOKEN, G_BROADCAST_ID)
+      .then(response => {
+        // update list.json on S3
+        const newObject = {
+          event: "startlive",
+          backet: bucket_name,
+          time: new Date().toLocaleString('sv')
+        };
+        updateListJson(bucket_name, G_BROADCAST_ID, newObject);
+      });
 
       // このメッセージは即座に返す
       return client.replyMessage(event.replyToken, {
