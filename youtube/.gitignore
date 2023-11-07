@@ -1,0 +1,28 @@
+# googles' secrets
+client_secrets.*
+upload_video.py-oauth2.json
+sidecar-linebot-oauth2.json
+stream_info.json
+
+# outputs by prepare_live.sh
+access_token.txt
+broadcast_id.txt
+stream_id.txt
+
+# ?
+.credentials.swp
+
+# log
+nohup.out
+
+# node_moidules
+node_modules/
+
+# video files
+*.h264
+*.mp4
+
+# image files
+*.jpg
+
+
