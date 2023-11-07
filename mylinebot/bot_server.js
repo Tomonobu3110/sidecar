@@ -180,6 +180,50 @@ function my_sleep(time) {
   });
 }
 
+// [YouTube API] Stop YouTube Live
+async function stop_youtube_live(broadcast_id) {
+  try {
+    var data = fs.readFileSync(credentials_google, 'utf8');
+    const jsonContent = JSON.parse(data);
+    const REFRESH_TOKEN = jsonContent.refresh_token;
+    const CLIENT_ID     = jsonContent.client_id;
+    const CLIENT_SECRET = jsonContent.client_secret;
+    if (!REFRESH_TOKEN || !CLIENT_ID || !CLIENT_SECRET) {
+      console.error("Missing environment variables.");
+      process.exit(1);
+    }
+
+    // oauth to get Access Token
+    const requestData1 = {
+      refresh_token: REFRESH_TOKEN,
+      client_id:     CLIENT_ID,
+      client_secret: CLIENT_SECRET,
+      grant_type:    'refresh_token'
+    };
+    const response1 = await axios.post('https://www.googleapis.com/oauth2/v4/token', null, {
+      params: requestData1
+    });
+    const ACCESS_TOKEN = response1.data.access_token;
+    G_ACCESS_TOKEN = ACCESS_TOKEN;
+    fs.writeFileSync('access_token.txt', ACCESS_TOKEN);
+    console.log('Access token saved to access_token.txt:', ACCESS_TOKEN);
+
+    // change live status to 'complete'
+    const response2 = await axios.post(`https://youtube.googleapis.com/youtube/v3/liveBroadcasts/transition?broadcastStatus=complete&id=${broadcast_id}&part=id&part=snippet&part=contentDetails&part=status`, null, {
+      headers: {
+        Authorization: `Bearer ${ACCESS_TOKEN}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    });
+    console.log('Transition to complete successful:', response2.data);
+
+    // fin.
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 //
 // Web Server (Line Bot)
 //
@@ -442,28 +486,22 @@ async function handleEvent(event) {
     }
 
     else if (event.message.text == 'ライブ終了') {
-      exec('bash stop_live.sh', (err, stdout, stderr) => {
-        const bucket_name = 'youtube-iframe-player-api-test';
+      stop_youtube_live(G_BROADCAST_ID)
+      .then(response => {
+        exec('bash stop_live.sh', (err, stdout, stderr) => {
+          // update list.json on S3
+          const bucket_name = 'youtube-iframe-player-api-test';
+          const newObject = {
+            event: "stoplive",
+            backet: bucket_name,
+            time: new Date().toLocaleString('sv')
+          };
+          updateListJson(bucket_name, G_BROADCAST_ID, newObject);
 
-        // read broadcast_id
-        var broadcast_id;
-        try {
-          broadcast_id = fs.readFileSync('./broadcast_id.txt', 'utf8');
-        } catch (err) {
-          //console.log(err);
-        }
-        
-        // update list.json on S3
-        const newObject = {
-          event: "stoplive",
-          backet: bucket_name,
-          time: new Date().toLocaleString('sv')
-        };
-        updateListJson(bucket_name, broadcast_id, newObject);
-
-        return client.replyMessage(event.replyToken, {
-          type: 'text',
-          text: 'ライブを終了します'
+          return client.replyMessage(event.replyToken, {
+            type: 'text',
+            text: 'ライブを終了します'
+          });
         });
       });
     }
